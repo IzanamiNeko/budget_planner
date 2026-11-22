@@ -1,0 +1,346 @@
+{
+  "entities": {
+    "UserSettings": {
+      "title": "UserSettings",
+      "description": "Account-level budget preferences and profile metadata for a signed-in user.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the account owner.",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name shown in the account menu.",
+          "maxLength": 120
+        },
+        "monthlyLimit": {
+          "type": "number",
+          "description": "Monthly budget limit in EUR (200 to 3000)."
+        },
+        "theme": {
+          "type": "string",
+          "description": "Preferred UI theme.",
+          "enum": ["light", "dark"],
+          "maxLength": 16
+        },
+        "debtStrategy": {
+          "type": "string",
+          "description": "Selected debt payoff strategy (avalanche or snowball).",
+          "enum": ["avalanche", "snowball"],
+          "maxLength": 16
+        },
+        "debtExtraMonthly": {
+          "type": "number",
+          "description": "Optional extra monthly debt payoff amount in EUR."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last update timestamp."
+        }
+      },
+      "required": ["uid", "displayName", "monthlyLimit", "theme", "createdAt", "updatedAt"]
+    },
+    "CategoryDoc": {
+      "title": "CategoryDoc",
+      "description": "Budget category configuration and monthly target for a user.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Category identifier.",
+          "enum": ["lebensmittel", "kaffee", "mobilitaet", "freizeit", "haushalt", "sonstiges"],
+          "maxLength": 32
+        },
+        "ownerId": {
+          "type": "string",
+          "description": "Firebase Auth UID of the owner.",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the category.",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "targetBudget": {
+          "type": "number",
+          "description": "Monthly target budget in EUR."
+        },
+        "accentHex": {
+          "type": "string",
+          "description": "Hex color code for category charts.",
+          "maxLength": 16,
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["id", "ownerId", "name", "targetBudget", "accentHex", "createdAt", "updatedAt"]
+    },
+    "TransactionDoc": {
+      "title": "TransactionDoc",
+      "description": "Individual expense transaction belonging to a user account.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "amount": {
+          "type": "number"
+        },
+        "categoryId": {
+          "type": "string",
+          "enum": ["lebensmittel", "kaffee", "mobilitaet", "freizeit", "haushalt", "sonstiges"],
+          "maxLength": 32
+        },
+        "date": {
+          "type": "string",
+          "maxLength": 10,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "clientCreatedAt": {
+          "type": "number"
+        },
+        "recurringId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "recurringInterval": {
+          "type": "string",
+          "enum": ["monthly", "weekly"],
+          "maxLength": 16
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["ownerId", "title", "amount", "categoryId", "date", "clientCreatedAt", "createdAt", "updatedAt"]
+    },
+    "RecurringRuleDoc": {
+      "title": "RecurringRuleDoc",
+      "description": "Recurring expense subscription rule for automatic monthly or weekly bookings.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "amount": {
+          "type": "number"
+        },
+        "categoryId": {
+          "type": "string",
+          "enum": ["lebensmittel", "kaffee", "mobilitaet", "freizeit", "haushalt", "sonstiges"],
+          "maxLength": 32
+        },
+        "interval": {
+          "type": "string",
+          "enum": ["monthly", "weekly"],
+          "maxLength": 16
+        },
+        "startDate": {
+          "type": "string",
+          "maxLength": 10,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "generatedPeriods": {
+          "type": "array",
+          "description": "Bounded list of already generated period keys (max 120)."
+        },
+        "clientCreatedAt": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["ownerId", "title", "amount", "categoryId", "interval", "startDate", "active", "generatedPeriods", "clientCreatedAt", "createdAt", "updatedAt"]
+    },
+    "SavingsGoalDoc": {
+      "title": "SavingsGoalDoc",
+      "description": "Category-based savings goal and monthly contributions.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "categoryLabel": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "targetAmount": {
+          "type": "number"
+        },
+        "initialSaved": {
+          "type": "number"
+        },
+        "monthlyTarget": {
+          "type": "number"
+        },
+        "accentHex": {
+          "type": "string",
+          "maxLength": 16,
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "contributions": {
+          "type": "array",
+          "description": "Bounded list of savings contributions (max 200)."
+        },
+        "clientCreatedAt": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["ownerId", "title", "categoryLabel", "targetAmount", "initialSaved", "monthlyTarget", "accentHex", "contributions", "clientCreatedAt", "createdAt", "updatedAt"]
+    },
+    "DebtDoc": {
+      "title": "DebtDoc",
+      "description": "Tracked debt or loan with balance, interest rate, minimum monthly payment, and repayment log.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "creditor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "initialBalance": {
+          "type": "number"
+        },
+        "currentBalance": {
+          "type": "number"
+        },
+        "interestRate": {
+          "type": "number"
+        },
+        "minimumPayment": {
+          "type": "number"
+        },
+        "termMonths": {
+          "type": "number",
+          "description": "Optional loan term in months (1 to 600)."
+        },
+        "disbursedAt": {
+          "type": "string",
+          "maxLength": 10,
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Optional loan disbursement date in ISO YYYY-MM-DD format."
+        },
+        "accentHex": {
+          "type": "string",
+          "maxLength": 16,
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "payments": {
+          "type": "array",
+          "description": "Bounded list of debt repayments (max 200)."
+        },
+        "clientCreatedAt": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["ownerId", "title", "creditor", "initialBalance", "currentBalance", "interestRate", "minimumPayment", "accentHex", "payments", "clientCreatedAt", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserSettings" },
+      "description": "Stores each authenticated user's monthly budget limit, UI theme, debt payoff preferences, and profile name."
+    },
+    "/users/{userId}/categories/{categoryId}": {
+      "schema": { "$ref": "#/entities/CategoryDoc" },
+      "description": "Stores the user's budget categories and monthly category targets."
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/TransactionDoc" },
+      "description": "Stores individual expense transactions owned by the user."
+    },
+    "/users/{userId}/recurringRules/{ruleId}": {
+      "schema": { "$ref": "#/entities/RecurringRuleDoc" },
+      "description": "Stores recurring subscription rules owned by the user."
+    },
+    "/users/{userId}/savingsGoals/{goalId}": {
+      "schema": { "$ref": "#/entities/SavingsGoalDoc" },
+      "description": "Stores savings goals and monthly reservations owned by the user."
+    },
+    "/users/{userId}/debts/{debtId}": {
+      "schema": { "$ref": "#/entities/DebtDoc" },
+      "description": "Stores tracked debts, interest rates, minimum payments, and repayment entries owned by the user."
+    }
+  }
+}
